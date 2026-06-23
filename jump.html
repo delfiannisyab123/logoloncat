@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Dino Jump</title>
+
+<style>
+body{
+    margin:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    font-family:Arial;
+}
+
+#game{
+    width:800px;
+    height:250px;
+    border:2px solid black;
+    position:relative;
+    overflow:hidden;
+}
+
+#dino{
+    width:50px;
+    height:50px;
+    background-image:url("logo.jpeg");
+    background-size:contain;
+    background-repeat:no-repeat;
+    background-position:center;
+    position:absolute;
+    bottom:0;
+    left:50px;
+}
+
+#cactus{
+    width:25px;
+    height:50px;
+    background:green;
+    position:absolute;
+    bottom:0;
+    right:-30px;
+}
+
+#score{
+    position:absolute;
+    top:10px;
+    right:15px;
+    font-size:20px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+    <div id="score">0</div>
+    <div id="dino"></div>
+    <div id="cactus"></div>
+</div>
+
+<script>
+const dino = document.getElementById("dino");
+const cactus = document.getElementById("cactus");
+const scoreText = document.getElementById("score");
+
+let jumping = false;
+let score = 0;
+let gameOver = false;
+
+document.addEventListener("keydown", function(e){
+    if(e.code === "Space" || e.code === "ArrowUp"){
+        jump();
+    }
+});
+
+function jump(){
+    if(jumping || gameOver) return;
+
+    jumping = true;
+
+    let position = 0;
+
+    const up = setInterval(() => {
+
+        if(position >= 120){
+            clearInterval(up);
+
+            const down = setInterval(() => {
+
+                if(position <= 0){
+                    clearInterval(down);
+                    jumping = false;
+                }
+
+                position -= 5;
+                dino.style.bottom = position + "px";
+
+            },20);
+
+        }
+
+        position += 5;
+        dino.style.bottom = position + "px";
+
+    },20);
+}
+
+let cactusX = 800;
+
+function gameLoop(){
+
+    if(gameOver) return;
+
+    cactusX -= 6;
+
+    if(cactusX < -30){
+        cactusX = 800;
+        score++;
+        scoreText.textContent = score;
+    }
+
+    cactus.style.left = cactusX + "px";
+
+    const dinoBottom = parseInt(getComputedStyle(dino).bottom);
+
+    if(
+        cactusX > 40 &&
+        cactusX < 90 &&
+        dinoBottom < 45
+    ){
+        gameOver = true;
+
+        alert("Game Over! Skor: " + score);
+
+        location.reload();
+    }
+
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+</script>
+
+</body>
+</html>
